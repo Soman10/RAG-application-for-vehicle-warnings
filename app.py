@@ -3,6 +3,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.schema import Document
+import os
 
 
 # Function to extract text from PDF
@@ -53,10 +54,12 @@ def run_query(rag_chain, query):
     result = rag_chain({"query": query})
     return result
 
-# Main setup function (run this only once)
 def main_setup():
-    openai_api_key = "sk-Pah0YaVuHAhix-uA6YcJHwcAc_AGJtUNxs7L1j4xGuT3BlbkFJb0GMOuFkMBxstVIRx1Vvj1G6Ox9x4rdHtycsgNsMEA"  # Set your actual OpenAI API key here
-    file_path = "D:\\AI_Projects\\Vehicle Warning using RAG\\User Manual.pdf"
+    openai_api_key = os.getenv("OPENAI_API_KEY")  # Get API key from environment variable
+    if not openai_api_key:
+        raise ValueError("Please set the OPENAI_API_KEY environment variable")
+    
+    file_path = "file_path"
 
     text_content = extract_text_from_pdf(file_path)
     documents = split_by_warning_sections(text_content)
@@ -69,7 +72,7 @@ chroma_store, openai_api_key = main_setup()
 # Initialize the RetrievalQA system (run once after setup)
 rag_chain = setup_retrieval_qa(chroma_store, openai_api_key)
 
-# Example usage: Run a query (run this part whenever you need to query)
+# Example
 query = "I can see the check engine fault on my dashboard. What does this mean and what should I do about it?"
 result = run_query(rag_chain, query)
 print(result['result'])  # Print the answer
